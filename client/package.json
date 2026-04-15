@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 3000",
     "build": "next build",
     "start": "next start",
+    "api:generate": "bunx orval --config ./orval.config.ts",
     "lint": "biome check",
     "format": "biome format --write"
   },
@@ -14,6 +15,7 @@
     "@mantine/form": "^9.0.2",
     "@mantine/hooks": "^9.0.2",
     "@mantine/notifications": "^9.0.2",
+    "@tabler/icons-react": "^3.41.1",
     "@tanstack/react-query": "^5.99.0",
     "axios": "^1.15.0",
     "next": "16.2.3",
