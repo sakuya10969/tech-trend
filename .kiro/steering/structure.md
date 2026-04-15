@@ -29,7 +29,7 @@ client/src/
 │       ├── trends/
 │       │   └── page.tsx
 │       └── ...
-├── pages/            # ページ単位の構成（FSD の pages レイヤー）
+├── pages(views)/            # ページ単位の構成（FSD の pages(views) レイヤー）
 │   └── trends/
 │       ├── ui/       # ページ固有の UI 構成
 │       └── index.ts
@@ -65,10 +65,10 @@ client/src/
 - レイアウト、メタデータ、グローバル CSS を定義する
 - ビジネスロジックは置かない
 
-#### pages
+#### pages(views)
 
 - FSD における pages レイヤー。画面単位の構成を担う
-- Next.js の `app/(routes)/` 内の `page.tsx` は薄く保ち、実際の画面構成は `pages/` レイヤーのコンポーネントに委譲する
+- Next.js の `app/(routes)/` 内の `page.tsx` は薄く保ち、実際の画面構成は `pages(views)/` レイヤーのコンポーネントに委譲する
 - widgets や features を組み合わせてページを構成する
 - ページ固有のレイアウト調整のみ行い、ドメインロジックは持たない
 
@@ -123,20 +123,21 @@ client/src/
 
 ### ディレクトリ構成
 
+各機能モジュールは `server/src/` 直下に配置する。`modules/` のような中間ディレクトリは設けない。
+
 ```
 server/src/
 ├── index.ts              # エントリポイント（Hono アプリ初期化・モジュール登録）
-├── modules/              # 機能モジュール群
-│   └── github/           # GitHub モジュール（初期フェーズの主軸）
-│       ├── routes.ts     # ルーティング定義（OpenAPI スキーマ付き）
-│       ├── usecases/     # ユースケース層（ビジネスロジック）
-│       │   └── get-trending-repositories.ts
-│       ├── clients/      # 外部 API クライアント層
-│       │   └── github-graphql-client.ts
-│       ├── schemas/      # Zod スキーマ（リクエスト/レスポンス定義）
-│       │   └── trending.ts
-│       └── types/        # モジュール内部の型定義
-│           └── github-api.ts
+├── github/               # GitHub モジュール（初期フェーズの主軸）
+│   ├── routes.ts         # ルーティング定義（OpenAPI スキーマ付き）
+│   ├── usecases/         # ユースケース層（ビジネスロジック）
+│   │   └── get-trending-repositories.ts
+│   ├── clients/          # 外部 API クライアント層
+│   │   └── github-graphql-client.ts
+│   ├── schemas/          # Zod スキーマ（リクエスト/レスポンス定義）
+│   │   └── trending.ts
+│   └── types/            # モジュール内部の型定義
+│       └── github-api.ts
 ├── shared/               # モジュール横断の共通コード
 │   ├── middleware/        # 共通ミドルウェア（CORS、エラーハンドリング等）
 │   ├── errors/           # 共通エラー定義
@@ -183,14 +184,17 @@ server/src/
 ### 将来のモジュール追加イメージ
 
 ```
-server/src/modules/
+server/src/
 ├── github/       # GitHub トレンド取得（初期フェーズ）
 ├── reddit/       # Reddit 技術系サブレディット取得（将来）
 ├── hackernews/   # Hacker News トレンド取得（将来）
-└── aggregator/   # 複数ソースの横断集約（将来）
+├── aggregator/   # 複数ソースの横断集約（将来）
+├── shared/       # 共通コード
+├── openapi/      # OpenAPI 設定
+└── index.ts      # エントリポイント
 ```
 
-新しいデータソースを追加する際は、対応するモジュールディレクトリを作成し、同じ層構成（routes / usecases / clients / schemas / types）で実装する。既存モジュールやフロントエンドへの影響を最小限に抑える。
+新しいデータソースを追加する際は、`server/src/` 直下に対応するモジュールディレクトリを作成し、同じ層構成（routes / usecases / clients / schemas / types）で実装する。既存モジュールやフロントエンドへの影響を最小限に抑える。
 
 ### OpenAPI ドキュメント管理
 
