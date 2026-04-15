@@ -34,6 +34,7 @@
 ### モジュラーモノリス
 
 - データソース単位でモジュールを分離する（github, reddit, hackernews 等）
+- 各モジュールは `server/src/` 直下にディレクトリとして配置する（`modules/` のような中間ディレクトリは設けない）
 - 各モジュールは routes / usecases / clients / schemas / types の層構成を持つ
 - モジュール間の直接参照は避け、公開インターフェースは routes のみ
 - 共通処理は shared/ に配置する
