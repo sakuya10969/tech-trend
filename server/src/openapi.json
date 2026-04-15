@@ -1,0 +1,340 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Tech Trend API",
+    "version": "1.0.0",
+    "description": "GitHub trends API for the initial Tech Trend phase."
+  },
+  "components": {
+    "schemas": {
+      "TrendingRepositoriesResponse": {
+        "type": "object",
+        "properties": {
+          "repositories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrendingRepository"
+            }
+          },
+          "period": {
+            "type": "string",
+            "enum": [
+              "daily",
+              "weekly"
+            ],
+            "default": "daily",
+            "example": "daily",
+            "description": "Trend aggregation period."
+          },
+          "fetchedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "repositories",
+          "fetchedAt"
+        ]
+      },
+      "TrendingRepository": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "example-repo"
+          },
+          "owner": {
+            "type": "string",
+            "example": "example-user"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "language": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "TypeScript"
+          },
+          "languageColor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "#3178c6"
+          },
+          "stars": {
+            "type": "integer",
+            "example": 12345
+          },
+          "forks": {
+            "type": "integer",
+            "example": 678
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "trendScore": {
+            "type": "number",
+            "example": 95.2
+          }
+        },
+        "required": [
+          "name",
+          "owner",
+          "description",
+          "language",
+          "languageColor",
+          "stars",
+          "forks",
+          "url",
+          "trendScore"
+        ]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "$ref": "#/components/schemas/ErrorCode"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ]
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "ErrorCode": {
+        "type": "string",
+        "enum": [
+          "RATE_LIMIT_EXCEEDED",
+          "EXTERNAL_API_ERROR",
+          "VALIDATION_ERROR",
+          "INTERNAL_ERROR"
+        ]
+      },
+      "TrendingLanguagesResponse": {
+        "type": "object",
+        "properties": {
+          "languages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrendingLanguage"
+            }
+          }
+        },
+        "required": [
+          "languages"
+        ]
+      },
+      "TrendingLanguage": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "TypeScript"
+          },
+          "color": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "#3178c6"
+          }
+        },
+        "required": [
+          "name",
+          "color"
+        ]
+      }
+    },
+    "parameters": {}
+  },
+  "paths": {
+    "/api/v1/github/trending/repositories": {
+      "get": {
+        "operationId": "getTrendingRepositories",
+        "tags": [
+          "GitHub Trending"
+        ],
+        "summary": "Get trending GitHub repositories",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "TypeScript,Rust",
+              "description": "Optional language filter. Multiple values can be passed as a comma-separated string."
+            },
+            "required": false,
+            "description": "Optional language filter. Multiple values can be passed as a comma-separated string.",
+            "name": "language",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "daily",
+                "weekly"
+              ],
+              "default": "daily",
+              "example": "daily",
+              "description": "Trend aggregation period."
+            },
+            "required": false,
+            "description": "Trend aggregation period.",
+            "name": "period",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Trending repositories",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrendingRepositoriesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "External API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/github/trending/languages": {
+      "get": {
+        "operationId": "getTrendingLanguages",
+        "tags": [
+          "GitHub Trending"
+        ],
+        "summary": "Get languages included in trending results",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "daily",
+                "weekly"
+              ],
+              "default": "daily",
+              "example": "daily",
+              "description": "Trend aggregation period."
+            },
+            "required": false,
+            "description": "Trend aggregation period.",
+            "name": "period",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Trending languages",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrendingLanguagesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "External API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "webhooks": {}
+}
